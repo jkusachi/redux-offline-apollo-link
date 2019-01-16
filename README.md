@@ -2,7 +2,7 @@
 
 _NOTE_ This is still TBD. Use at your own risk!!
 
-This is a close fork of [https://github.com/jaydenseric/apollo-upload-client](apollo-upload-client), and acts as a drop in replacement.
+This is a close fork of [apollo-upload-client](https://github.com/jaydenseric/apollo-upload-client), and acts as a drop in replacement.
 
 I needed a way to get customized actions dispatched from apollo as network activity occured (request, success, failures).
 
@@ -10,7 +10,7 @@ This is closely tied with Redux Offline.
 
 Redux Offline offers actions to be dispatched when a device is offline and go to a queue _(aka outbox)_.
 
-[https://github.com/redux-offline/redux-offline](Read more about Redux Offline)
+[Read more about Redux Offline](https://github.com/redux-offline/redux-offline)
 
 ### Requirements
 
