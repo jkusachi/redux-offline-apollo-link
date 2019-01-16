@@ -1,6 +1,6 @@
 # Redux Offline Apollo Link
 
-*NOTE* This is still TBD. Use at your own risk!!
+_NOTE_ This is still TBD. Use at your own risk!!
 
 This is a close fork of [https://github.com/jaydenseric/apollo-upload-client](apollo-upload-client), and acts as a drop in replacement.
 
@@ -21,12 +21,12 @@ Redux Offline offers actions to be dispatched when a device is offline and go to
 
 ```js
 import { ApolloClient } from "apollo-client";
-import { customUploadLink } from "../../apollo/upload-client";
+import { reduxOfflineApolloLink } from "redux-offline-apollo-link";
 import { store } from "../../store";
 
 export const client = new ApolloClient({
   link: ApolloLink.from([
-    customUploadLink(
+    reduxOfflineApolloLink(
       {
         uri: "http://your.graphql.server.com:3001/graphql"
       },
@@ -41,10 +41,9 @@ export const client = new ApolloClient({
 
 In order to use the redux actions, you need to provide an `options.variables.actionType` to your `graphql` higher order component call.
 
-* `options.variables.actionType` REQUIRED - The name of the request action
-* `options.variables.actionCommitSuffix` - Suffix of the action type when a success occurs _Default: "COMMIT"_
-* `options.variables.actionRollbackSuffix` - Suffix of the action type when a rollback occurs _Default: "ROLLBACK"_
-
+- `options.variables.actionType` REQUIRED - The name of the request action
+- `options.variables.actionCommitSuffix` - Suffix of the action type when a success occurs _Default: "COMMIT"_
+- `options.variables.actionRollbackSuffix` - Suffix of the action type when a rollback occurs _Default: "ROLLBACK"_
 
 **graphql Query HoC Example**
 
@@ -73,7 +72,6 @@ export default compose(
   ),
   connect(state => ({}))
 )(DemoQuery);
-
 ```
 
 **graphql Mutation Example**

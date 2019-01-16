@@ -11,7 +11,7 @@ import {
 } from "apollo-link-http-common";
 import { extractFiles } from "extract-files";
 
-const customUploadLink = (
+const reduxOfflineApolloLink = (
   {
     uri: fetchUri = "/graphql",
     fetch: linkFetch = fetch,
@@ -181,4 +181,4 @@ const customUploadLink = (
   });
 };
 
-export { customUploadLink };
+export { reduxOfflineApolloLink };
