@@ -1,0 +1,25 @@
+{
+  "name": "redux-offline-apollo",
+  "version": "0.0.1",
+  "description": "A Wrapper Function to switch between using apollo client links and redux offline actions",
+  "main": "dist/index.js",
+  "repository": "https://github.com/jkusachi/redux-offline-apollo",
+  "author": "James Kusachi",
+  "license": "MIT",
+  "dependencies": {
+    "apollo-link-http-common": "^0.2.8",
+    "apollo-utilities": "^1.0.27",
+    "extract-files": "^5.0.0",
+    "lodash": "^4.17.11",
+    "tslint": "^5.12.1",
+    "typescript": "^3.2.2"
+  },
+  "scripts": {
+    "lint": "tslint -c tslint.json -p tsconfig.json",
+    "build": "tsc"
+  },
+  "peerDependencies": {
+    "graphql-tag": "^2",
+    "react-apollo": "^2"
+  }
+}
