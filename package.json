@@ -16,10 +16,14 @@
   },
   "scripts": {
     "lint": "tslint -c tslint.json -p tsconfig.json",
-    "build": "tsc"
+    "build": "tsc",
+    "jsdoc": "jsdoc-md"
   },
   "peerDependencies": {
     "graphql-tag": "^2",
     "react-apollo": "^2"
+  },
+  "devDependencies": {
+    "jsdoc-md": "^1.7.0"
   }
 }
