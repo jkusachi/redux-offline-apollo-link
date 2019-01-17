@@ -1,6 +1,6 @@
 {
   "name": "redux-offline-apollo-link",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "A Wrapper Function to switch between using apollo client links and redux offline actions",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
