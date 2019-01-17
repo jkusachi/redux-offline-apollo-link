@@ -18,7 +18,8 @@
   "scripts": {
     "lint": "tslint -c tslint.json -p tsconfig.json",
     "build": "tsc",
-    "jsdoc": "jsdoc-md"
+    "jsdoc": "jsdoc-md",
+    "prepublish": "npm run build"
   },
   "peerDependencies": {
     "graphql-tag": "^2",
