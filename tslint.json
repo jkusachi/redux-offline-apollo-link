@@ -8,5 +8,8 @@
     "object-literal-sort-keys": false,
     "arrow-parens": [false],
     "interface-name": false
+  },
+  "linterOptions": {
+    "exclude": ["node_modules"]
   }
 }
