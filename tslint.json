@@ -6,6 +6,7 @@
     "ordered-imports": false,
     "trailing-comma": false,
     "object-literal-sort-keys": false,
-    "arrow-parens": [false]
+    "arrow-parens": [false],
+    "interface-name": false
   }
 }

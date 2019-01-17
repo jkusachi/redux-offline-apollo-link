@@ -11,6 +11,15 @@ import {
 } from "apollo-link-http-common";
 import { extractFiles } from "extract-files";
 
+interface Options {
+  uri?: string;
+  fetch?: any;
+  fetchOptions?: any;
+  credentials?: any;
+  headers?: any;
+  includeExtensions?: any;
+}
+
 const reduxOfflineApolloLink = (
   {
     uri: fetchUri = "/graphql",
@@ -19,7 +28,7 @@ const reduxOfflineApolloLink = (
     credentials,
     headers,
     includeExtensions
-  } = {},
+  }: Options = {},
   store
 ) => {
   const linkConfig = {
