@@ -22,6 +22,7 @@
     "prepublish": "npm run build"
   },
   "peerDependencies": {
+    "graphql": "^14",
     "graphql-tag": "^2",
     "react-apollo": "^2"
   },
