@@ -73,6 +73,7 @@ const reduxOfflineApolloLink = (
       "ROLLBACK"
     );
 
+    let contentType;
     if (files.size) {
       delete options.headers["content-type"];
       // GraphQL multipart request spec:
@@ -93,8 +94,10 @@ const reduxOfflineApolloLink = (
       });
 
       options.body = form;
+      contentType = "multipart/form-data;";
     } else {
       options.body = payload;
+      contentType = "application/json";
     }
 
     const action = {
@@ -106,7 +109,7 @@ const reduxOfflineApolloLink = (
             method: "POST",
             body: options.body,
             headers: {
-              "content-type": "multipart/form-data;"
+              "content-type": contentType
             }
           },
           // action to dispatch when effect succeeds:
