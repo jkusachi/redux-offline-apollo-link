@@ -64,12 +64,12 @@ const reduxOfflineApolloLink = (
     const reduxActionName = get(operation, "variables.actionType");
     const reduxCommitSuffix = get(
       operation,
-      "options.variables.actionCommitSuffix",
+      "variables.actionCommitSuffix",
       "COMMIT"
     );
     const reduxRollbackSuffix = get(
       operation,
-      "options.variables.actionRollbackSuffix",
+      "variables.actionRollbackSuffix",
       "ROLLBACK"
     );
 
