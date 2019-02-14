@@ -61,6 +61,7 @@ const reduxOfflineApolloLink = (
     const { clone, files } = extractFiles(body);
     const payload = serializeFetchParameter(clone, "Payload");
 
+    const linkFetchOptions = get(operation, "variables.options", {});
     const reduxActionName = get(operation, "variables.actionType");
     const reduxCommitSuffix = get(
       operation,
@@ -160,6 +161,24 @@ const reduxOfflineApolloLink = (
           return response;
         })
         .then(parseAndCheckHttpResponse(operation))
+        .then(result => {
+          if (
+            linkFetchOptions.payloadFormatter &&
+            typeof linkFetchOptions.payloadFormatter === "function"
+          ) {
+            if (linkFetchOptions.debug) {
+              console.group("Payload Formatter");
+              console.log("Raw: ", result);
+              console.log(
+                "Formatted: ",
+                linkFetchOptions.payloadFormatter(result)
+              );
+              console.groupEnd();
+            }
+            return linkFetchOptions.payloadFormatter(result);
+          }
+          return result;
+        })
         .then(result => {
           store.dispatch({
             ...commitAction,

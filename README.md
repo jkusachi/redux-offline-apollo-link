@@ -39,11 +39,30 @@ export const client = new ApolloClient({
 
 ### Usage in Components
 
-In order to use the redux actions, you need to provide an `options.variables.actionType` to your `graphql` higher order component call.
+In order to use the redux actions, you need to provide a `variables.[VARIABLE NAME]` to your `graphql` higher order component call.
 
-- `options.variables.actionType` REQUIRED - The name of the request action
-- `options.variables.actionCommitSuffix` - Suffix of the action type when a success occurs _Default: "COMMIT"_
-- `options.variables.actionRollbackSuffix` - Suffix of the action type when a rollback occurs _Default: "ROLLBACK"_
+
+The only *REQUIRED* variable to date is `actionType`
+
+
+
+
+
+### Variables
+
+
+- `actionType` *REQUIRED* - The name of the request action
+- `actionCommitSuffix` - Suffix of the action type when a success occurs _Default: "COMMIT"_
+- `actionRollbackSuffix` - Suffix of the action type when a rollback occurs _Default: "ROLLBACK"_
+- `options` - Suffix of the action type when a rollback occurs _Default: "ROLLBACK"_
+	- `payloadFormatter(payload)` Optional Function to format the response coming back from GraphQL on a successful retrieval. `payload` is provided as a parameter.  This function returns back the modified data.  This is a good place to run data normalizations
+
+	
+
+---
+
+### Examples
+
 
 **graphql Query HoC Example**
 
@@ -65,7 +84,15 @@ export default compose(
         variables: {
           actionType: "DEMO_QUERY",
           actionCommitSuffix: "COMMIT",
-          actionRollbackSuffix: "ROLLBACK"
+          actionRollbackSuffix: "ROLLBACK",
+          options: {
+            payloadFormatter(payload) {
+              return doSomething({
+                ...payload,
+                extra: true,
+              });
+            }
+          }
         }
       }
     }
@@ -102,3 +129,33 @@ export default compose(
   }))
 )(Mutation);
 ```
+
+
+**Direct Client call Example**
+
+```js
+const { client } = this.props;
+return client
+  .query({
+    query,
+    fetchPolicy: "no-cache",
+    variables: {
+      startDateTimeUtc,
+      endDateTimeUtc,
+      actionType: "TODAY_SCHEDULES_REQUEST",
+      options: {
+        payloadFormatter(payload: any) {
+          return payload;
+        }
+      }
+    }
+  })
+```
+
+---
+
+
+
+
+
+
