@@ -188,6 +188,7 @@ const reduxOfflineApolloLink = (
           observer.complete();
         })
         .catch(error => {
+          console.warn(error);
           store.dispatch({
             ...rollbackAction,
             payload: error
