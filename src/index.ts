@@ -20,6 +20,16 @@ interface Options {
   includeExtensions?: any;
 }
 
+// function to check and display errors
+function checkAndDisplayErrors(result) {
+  if (result.errors && result.errors.length > 0) {
+    console.group("GraphQL Errors");
+    result.errors.map(console.log);
+    console.groupEnd();
+  }
+  return result;
+}
+
 const reduxOfflineApolloLink = (
   {
     uri: fetchUri = "/graphql",
@@ -161,6 +171,7 @@ const reduxOfflineApolloLink = (
           return response;
         })
         .then(parseAndCheckHttpResponse(operation))
+        .then(checkAndDisplayErrors)
         .then(result => {
           if (
             linkFetchOptions.payloadFormatter &&
