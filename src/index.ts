@@ -186,7 +186,7 @@ const reduxOfflineApolloLink = (
               );
               console.groupEnd();
             }
-            return linkFetchOptions.payloadFormatter(result);
+            return { data: linkFetchOptions.payloadFormatter(result) };
           }
           return result;
         })
