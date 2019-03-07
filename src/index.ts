@@ -191,6 +191,13 @@ const reduxOfflineApolloLink = (
           return result;
         })
         .then(result => {
+          if (linkFetchOptions.debug) {
+            console.group("Redux Result: ");
+            console.log("Dispatching: ", commitAction);
+            console.log("result.data", result.data);
+            console.groupEnd();
+          }
+
           store.dispatch({
             ...commitAction,
             payload: result.data
