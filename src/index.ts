@@ -1,4 +1,3 @@
-import pick from "lodash/pick";
 import get from "lodash/get";
 import { ApolloLink, Observable } from "apollo-link";
 import {
