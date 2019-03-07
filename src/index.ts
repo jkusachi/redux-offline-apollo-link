@@ -131,7 +131,12 @@ const reduxOfflineApolloLink = (
       }
     };
 
-    const requestAction = pick(action, ["type"]);
+    const requestAction = {
+      type: action.type,
+      payload: {
+        variables: operation.variables
+      }
+    };
     const commitAction = get(action, "meta.offline.commit");
     const rollbackAction = get(action, "meta.offline.rollback");
 
