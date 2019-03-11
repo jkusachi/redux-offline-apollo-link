@@ -119,6 +119,7 @@ const reduxOfflineApolloLink = (
             method: "POST",
             body: options.body,
             headers: {
+              ...context.headers,
               "content-type": contentType
             }
           },
