@@ -205,7 +205,7 @@ const reduxOfflineApolloLink = (
 
           store.dispatch({
             ...commitAction,
-            payload: result.data
+            payload: result
           });
           observer.next(result);
           observer.complete();
