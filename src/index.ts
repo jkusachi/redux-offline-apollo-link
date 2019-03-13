@@ -25,6 +25,7 @@ function checkAndDisplayErrors(result) {
     console.group("GraphQL Errors");
     result.errors.map(console.log);
     console.groupEnd();
+    throw result;
   }
   return result;
 }
@@ -211,11 +212,12 @@ const reduxOfflineApolloLink = (
           observer.complete();
         })
         .catch(error => {
-          console.warn(error);
           store.dispatch({
-            ...rollbackAction,
+            type: rollbackAction.type,
             payload: error
           });
+
+          console.warn("Error During GraphQL linkFetch\n", error);
 
           if (error.name === "AbortError") {
             // Fetch was aborted.
