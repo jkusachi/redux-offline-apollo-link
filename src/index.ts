@@ -214,7 +214,10 @@ const reduxOfflineApolloLink = (
         .catch(error => {
           store.dispatch({
             type: rollbackAction.type,
-            payload: error
+            payload: {
+              error,
+              variables: operation.variables
+            }
           });
 
           console.warn("Error During GraphQL linkFetch\n", error);
