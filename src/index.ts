@@ -1,4 +1,5 @@
 import get from "lodash/get";
+import omit from "lodash/omit";
 import { ApolloLink, Observable } from "apollo-link";
 import {
   selectURI,
@@ -129,15 +130,12 @@ const reduxOfflineApolloLink = (
           // action to dispatch if network action fails permanently:
           rollback: { type: `${reduxActionName}_${reduxRollbackSuffix}` }
         }
-      }
-    };
-
-    const requestAction = {
-      type: action.type,
+      },
       payload: {
         variables: operation.variables
       }
     };
+
     const commitAction = get(action, "meta.offline.commit");
     const rollbackAction = get(action, "meta.offline.rollback");
 
@@ -156,7 +154,8 @@ const reduxOfflineApolloLink = (
       });
     }
 
-    store.dispatch(requestAction);
+    // if online, we can dispatch the initial action without the .meta
+    store.dispatch(omit(action, ["meta"]));
 
     return new Observable(observer => {
       // Allow aborting fetch, if supported.
