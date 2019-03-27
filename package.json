@@ -27,6 +27,9 @@
     "react-apollo": "^2"
   },
   "devDependencies": {
+    "graphql": "^14",
+    "graphql-tag": "^2",
+    "react-apollo": "^2",
     "jsdoc-md": "^1.7.0"
   }
 }
