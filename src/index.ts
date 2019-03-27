@@ -1,15 +1,16 @@
-import get from "lodash/get";
-import omit from "lodash/omit";
 import { ApolloLink, Observable } from "apollo-link";
 import {
-  selectURI,
-  selectHttpOptionsAndBody,
-  fallbackHttpConfig,
-  serializeFetchParameter,
   createSignalIfSupported,
-  parseAndCheckHttpResponse
+  fallbackHttpConfig,
+  parseAndCheckHttpResponse,
+  selectHttpOptionsAndBody,
+  selectURI,
+  serializeFetchParameter
 } from "apollo-link-http-common";
+
 import { extractFiles } from "extract-files";
+import get from "lodash/get";
+import omit from "lodash/omit";
 
 interface Options {
   uri?: string;
@@ -20,12 +21,25 @@ interface Options {
   includeExtensions?: any;
 }
 
-// function to check and display errors
-function checkAndDisplayErrors(result) {
+/**
+ * check and display errors
+ * @param result
+ */
+function debugErrors(result) {
   if (result.errors && result.errors.length > 0) {
     console.group("GraphQL Errors");
     result.errors.map(console.log);
     console.groupEnd();
+  }
+  return result;
+}
+
+/**
+ * checks for errors and throws if they are available.
+ * @param result
+ */
+function errorsCheck(result) {
+  if (result.errors && result.errors.length > 0) {
     throw result;
   }
   return result;
@@ -175,8 +189,44 @@ const reduxOfflineApolloLink = (
           operation.setContext({ response });
           return response;
         })
-        .then(parseAndCheckHttpResponse(operation))
-        .then(checkAndDisplayErrors)
+        .then(response => {
+          if (
+            linkFetchOptions.parseAndHandleHttpResponse &&
+            typeof linkFetchOptions.parseAndHandleHttpResponse === "function"
+          ) {
+            return response
+              .text()
+              .then(bodyText => {
+                try {
+                  return JSON.parse(bodyText);
+                } catch (err) {
+                  const parseError = err;
+                  parseError.name = "ServerParseError";
+                  parseError.response = response;
+                  parseError.statusCode = response.status;
+                  parseError.bodyText = bodyText;
+                  return Promise.reject(parseError);
+                }
+              })
+              .then(result => {
+                return linkFetchOptions.parseAndHandleHttpResponse(
+                  operation,
+                  result
+                );
+              });
+          }
+          return parseAndCheckHttpResponse(operation)(response);
+        })
+        .then(debugErrors)
+        .then(result => {
+          if (
+            linkFetchOptions.errorsCheck &&
+            typeof linkFetchOptions.errorsCheck === "function"
+          ) {
+            return linkFetchOptions.errorsCheck(result);
+          }
+          return errorsCheck(result);
+        })
         .then(result => {
           if (
             linkFetchOptions.payloadFormatter &&
