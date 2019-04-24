@@ -58,6 +58,7 @@ The only *REQUIRED* variable to date is `actionType`
 	- `payloadFormatter(payload)` Optional Function to format the response coming back from GraphQL on a successful retrieval. `payload` is provided as a parameter.  This function returns back the modified data.  This is a good place to run data normalizations
   - `errorsCheck(result)` Optional Function to give the client the choice for whether it should throw an error if errors are present on GraphQL response. It throws an error by default if function is not provided.
   - `parseAndHandleHttpResponse(operation, result)` Optional Function to give the client the choice for whether it should throw an error if there's an HTTP/GraphQL schema error present on GraphQL response. It throws an error by default if the function is not provided.
+  - `skipOffline` Skips offline check returning error right away if connection can't be stablished.
 
 ---
 

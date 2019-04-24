@@ -160,12 +160,14 @@ const reduxOfflineApolloLink = (
       );
     }
 
-    if (!isOnline) {
-      store.dispatch(action);
-      return new Observable(observer => {
-        const { controller /*, signal */ } = createSignalIfSupported();
-        controller.abort();
-      });
+    if (!Boolean(linkFetchOptions.skipOffline)) {
+      if (!isOnline) {
+        store.dispatch(action);
+        return new Observable(observer => {
+          const { controller /*, signal */ } = createSignalIfSupported();
+          controller.abort();
+        });
+      }
     }
 
     // if online, we can dispatch the initial action without the .meta
