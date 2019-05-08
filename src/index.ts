@@ -19,14 +19,19 @@ interface Options {
   credentials?: any;
   headers?: any;
   includeExtensions?: any;
+  globalErrorsCheck?: any;
+  onCatchErrors?: any;
 }
 
 /**
  * check and display errors
  * @param result
  */
-function debugErrors(result) {
+function debugErrors(result, globalErrorsCheck) {
   if (result.errors && result.errors.length > 0) {
+    if (typeof globalErrorsCheck === "function") {
+      globalErrorsCheck(result);
+    }
     console.group("GraphQL Errors");
     result.errors.map(console.log);
     console.groupEnd();
@@ -52,7 +57,9 @@ const reduxOfflineApolloLink = (
     fetchOptions,
     credentials,
     headers,
-    includeExtensions
+    includeExtensions,
+    globalErrorsCheck,
+    onCatchErrors
   }: Options = {},
   store
 ) => {
@@ -219,7 +226,7 @@ const reduxOfflineApolloLink = (
           }
           return parseAndCheckHttpResponse(operation)(response);
         })
-        .then(debugErrors)
+        .then(errors => debugErrors(errors, globalErrorsCheck))
         .then(result => {
           if (
             linkFetchOptions.errorsCheck &&
@@ -270,6 +277,10 @@ const reduxOfflineApolloLink = (
               variables: operation.variables
             }
           });
+
+          if (typeof onCatchErrors === "function") {
+            onCatchErrors(error);
+          }
 
           console.warn("Error During GraphQL linkFetch\n", error);
 

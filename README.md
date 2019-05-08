@@ -41,21 +41,25 @@ export const client = new ApolloClient({
 
 In order to use the redux actions, you need to provide a `variables.[VARIABLE NAME]` to your `graphql` higher order component call.
 
+The only _REQUIRED_ variable to date is `actionType`
 
-The only *REQUIRED* variable to date is `actionType`
+### Options
 
-
-
-
+- `uri` - The GraphQL URI
+- `fetch` - Description Needed
+- `fetchOptions` - Description Needed
+- `credentials` - Description Needed
+- `headers` - Description Needed
+- `includeExtensions` - Description Needed
+- `globalErrorsCheck`: An Optional function to be called whenever a graphql result contains `errors`. Callback function contains a `result` parameter, which contains 2 keys, `errors` and `data`
+- `onCatchErrors`: An Optional function to be called during a `catch` from the `fetch` call. Callback function contains a single `error` parameter which contains the `Error`
 
 ### Variables
 
-
-- `actionType` *REQUIRED* - The name of the request action
+- `actionType` _REQUIRED_ - The name of the request action
 - `actionCommitSuffix` - Suffix of the action type when a success occurs _Default: "COMMIT"_
 - `actionRollbackSuffix` - Suffix of the action type when a rollback occurs _Default: "ROLLBACK"_
-- `options` - Suffix of the action type when a rollback occurs _Default: "ROLLBACK"_
-	- `payloadFormatter(payload)` Optional Function to format the response coming back from GraphQL on a successful retrieval. `payload` is provided as a parameter.  This function returns back the modified data.  This is a good place to run data normalizations
+- `options` - Suffix of the action type when a rollback occurs _Default: "ROLLBACK"_ - `payloadFormatter(payload)` Optional Function to format the response coming back from GraphQL on a successful retrieval. `payload` is provided as a parameter. This function returns back the modified data. This is a good place to run data normalizations
   - `errorsCheck(result)` Optional Function to give the client the choice for whether it should throw an error if errors are present on GraphQL response. It throws an error by default if function is not provided.
   - `parseAndHandleHttpResponse(operation, result)` Optional Function to give the client the choice for whether it should throw an error if there's an HTTP/GraphQL schema error present on GraphQL response. It throws an error by default if the function is not provided.
   - `skipOffline` Skips offline check returning error right away if connection can't be stablished.
@@ -63,7 +67,6 @@ The only *REQUIRED* variable to date is `actionType`
 ---
 
 ### Examples
-
 
 **graphql Query HoC Example**
 
@@ -90,7 +93,7 @@ export default compose(
             payloadFormatter(payload) {
               return doSomething({
                 ...payload,
-                extra: true,
+                extra: true
               });
             }
           }
@@ -131,32 +134,24 @@ export default compose(
 )(Mutation);
 ```
 
-
 **Direct Client call Example**
 
 ```js
 const { client } = this.props;
-return client
-  .query({
-    query,
-    fetchPolicy: "no-cache",
-    variables: {
-      startDateTimeUtc,
-      endDateTimeUtc,
-      actionType: "TODAY_SCHEDULES_REQUEST",
-      options: {
-        payloadFormatter(payload: any) {
-          return payload;
-        }
+return client.query({
+  query,
+  fetchPolicy: "no-cache",
+  variables: {
+    startDateTimeUtc,
+    endDateTimeUtc,
+    actionType: "TODAY_SCHEDULES_REQUEST",
+    options: {
+      payloadFormatter(payload: any) {
+        return payload;
       }
     }
-  })
+  }
+});
 ```
 
 ---
-
-
-
-
-
-
