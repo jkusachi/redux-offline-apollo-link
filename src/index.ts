@@ -189,11 +189,6 @@ const reduxOfflineApolloLink = (
 
       linkFetch(uri, options)
         .then(response => {
-          if (!response.ok) {
-            console.warn("Response OK!");
-            response.json().then(data => console.log(data));
-          }
-
           // Forward the response on the context.
           operation.setContext({ response });
           return response;
