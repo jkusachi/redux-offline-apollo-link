@@ -181,7 +181,6 @@ const reduxOfflineApolloLink = (
       linkFetch(uri, options)
         .then(response => {
           console.log("response", response);
-          console.log("- calls", linkFetch.mock.calls);
           // Forward the response on the context.
           operation.setContext({ response });
           return response;

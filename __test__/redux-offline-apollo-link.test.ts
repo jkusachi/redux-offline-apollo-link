@@ -206,5 +206,58 @@ describe("#reduxOfflineApolloLink", () => {
         }
       });
     });
+
+    // In this test, we do have an error but sometimes for GraphQL, having errors is OK and we don't want to throw
+    // "errorsCheck" allows you to override on a per-call basis, allowing you dedide if you should throw or continue
+    // If you return inside this method, the pipeline will continue on, therefore in this test we simply return the result, even if
+    // it has errors
+    it("errorsCheck - Option called if provided, and can continue if function does not throw inside", done => {
+      const mockResponse = {
+        data: "success",
+        errors: ["error one"]
+      };
+
+      fetchMock.mockResolvedValueOnce({
+        status: 200,
+        text() {
+          return Promise.resolve(JSON.stringify(mockResponse));
+        }
+      });
+
+      const errorsCheck = jest.fn(res => {
+        return res;
+      });
+
+      const link = reduxOfflineApolloLink(
+        {
+          uri: "https://www.example.com",
+          fetch: fetchMock
+        },
+        store
+      );
+
+      const operation = {
+        query: sampleQuery,
+        variables: {
+          actionType: "ACTION_TYPE",
+          options: {
+            errorsCheck
+          }
+        }
+      };
+
+      const observable = execute(link, operation);
+
+      observable.subscribe({
+        next: jest.fn(),
+        error: error => {
+          done();
+        },
+        complete: () => {
+          expect(errorsCheck).toHaveBeenCalledWith(mockResponse);
+          done();
+        }
+      });
+    });
   });
 });
