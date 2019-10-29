@@ -38,7 +38,7 @@ const makeCallback = (done, body) => {
 };
 
 describe("HttpLink", () => {
-  let fetchMock = jest.fn();
+  const fetchMock = jest.fn();
 
   beforeEach(() => {
     fetchMock.mockClear();
@@ -92,5 +92,26 @@ describe("HttpLink", () => {
         done();
       }
     });
+  });
+
+  it("Throws an error is redux variables.actionType is not supplied", done => {
+    const link = reduxOfflineApolloLink(
+      {
+        uri: "https://www.example.com",
+        fetch: fetchMock
+      },
+      store
+    );
+
+    const operation = {
+      query: sampleQuery
+    };
+
+    expect(() => execute(link, operation)).toThrowError(
+      `This custom link requires you to specify an \`options.variables.actionType\`
+         to handle redux offline actions in the event the device is offline`
+    );
+
+    done();
   });
 });

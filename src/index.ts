@@ -73,7 +73,6 @@ const reduxOfflineApolloLink = (
     headers
   };
 
-  console.log("in config");
   return new ApolloLink((operation, forward) => {
     const state = store.getState();
     const uri = selectURI(operation, fetchUri);
@@ -89,28 +88,15 @@ const reduxOfflineApolloLink = (
 
     console.log("new ApolloLink");
 
-    const { options, body } = selectHttpOptionsAndBody(
-      operation,
-      fallbackHttpConfig,
-      linkConfig,
-      contextConfig
-    );
+    const { options, body } = selectHttpOptionsAndBody(operation, fallbackHttpConfig, linkConfig, contextConfig);
 
     const { clone, files } = extractFiles(body);
     const payload = serializeFetchParameter(clone, "Payload");
 
     const linkFetchOptions = get(operation, "variables.options", {});
     const reduxActionName = get(operation, "variables.actionType");
-    const reduxCommitSuffix = get(
-      operation,
-      "variables.actionCommitSuffix",
-      "COMMIT"
-    );
-    const reduxRollbackSuffix = get(
-      operation,
-      "variables.actionRollbackSuffix",
-      "ROLLBACK"
-    );
+    const reduxCommitSuffix = get(operation, "variables.actionCommitSuffix", "COMMIT");
+    const reduxRollbackSuffix = get(operation, "variables.actionRollbackSuffix", "ROLLBACK");
 
     let contentType;
     if (files.size) {
@@ -223,10 +209,7 @@ const reduxOfflineApolloLink = (
                 }
               })
               .then(result => {
-                return linkFetchOptions.parseAndHandleHttpResponse(
-                  operation,
-                  result
-                );
+                return linkFetchOptions.parseAndHandleHttpResponse(operation, result);
               });
           }
           console.log(" - parseAndCheckHttpResponse", response);
@@ -240,26 +223,17 @@ const reduxOfflineApolloLink = (
         .then(errors => debugErrors(errors, globalErrorsCheck))
         .then(result => {
           console.log("got a result, ", result);
-          if (
-            linkFetchOptions.errorsCheck &&
-            typeof linkFetchOptions.errorsCheck === "function"
-          ) {
+          if (linkFetchOptions.errorsCheck && typeof linkFetchOptions.errorsCheck === "function") {
             return linkFetchOptions.errorsCheck(result);
           }
           return errorsCheck(result);
         })
         .then(result => {
-          if (
-            linkFetchOptions.payloadFormatter &&
-            typeof linkFetchOptions.payloadFormatter === "function"
-          ) {
+          if (linkFetchOptions.payloadFormatter && typeof linkFetchOptions.payloadFormatter === "function") {
             if (linkFetchOptions.debug) {
               console.group("Payload Formatter");
               console.log("Raw: ", result);
-              console.log(
-                "Formatted: ",
-                linkFetchOptions.payloadFormatter(result)
-              );
+              console.log("Formatted: ", linkFetchOptions.payloadFormatter(result));
               console.groupEnd();
             }
             return { data: linkFetchOptions.payloadFormatter(result) };
