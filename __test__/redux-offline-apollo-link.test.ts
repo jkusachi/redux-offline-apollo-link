@@ -114,4 +114,97 @@ describe("HttpLink", () => {
 
     done();
   });
+
+  describe("#Options", () => {
+    it("parseAndHandleHttpResponse - Called if provided in options", done => {
+      const mockResponse = {
+        data: "success"
+      };
+      fetchMock.mockResolvedValueOnce({
+        status: 200,
+        text() {
+          return Promise.resolve(JSON.stringify(mockResponse));
+        }
+      });
+
+      const link = reduxOfflineApolloLink(
+        {
+          uri: "https://www.example.com",
+          fetch: fetchMock
+        },
+        store
+      );
+
+      const operation = {
+        query: sampleQuery,
+        variables: {
+          actionType: "ACTION_TYPE",
+          options: {
+            parseAndHandleHttpResponse: jest.fn(() => mockResponse)
+          }
+        }
+      };
+
+      const observable = execute(link, operation);
+
+      observable.subscribe({
+        next: jest.fn(),
+        error: error => expect(false),
+        complete: () => {
+          expect(operation.variables.options.parseAndHandleHttpResponse).toHaveBeenCalledWith(
+            expect.objectContaining(operation),
+            mockResponse
+          );
+          done();
+        }
+      });
+    });
+
+    it("globalErrorsCheck - Called if response has any errors in it, and main result throws", done => {
+      const mockResponse = {
+        data: "success",
+        errors: ["error one"]
+      };
+
+      fetchMock.mockResolvedValueOnce({
+        status: 200,
+        text() {
+          return Promise.resolve(JSON.stringify(mockResponse));
+        }
+      });
+
+      const globalErrorsCheck = jest.fn();
+
+      const link = reduxOfflineApolloLink(
+        {
+          uri: "https://www.example.com",
+          fetch: fetchMock,
+          globalErrorsCheck
+        },
+        store
+      );
+
+      const operation = {
+        query: sampleQuery,
+        variables: {
+          actionType: "ACTION_TYPE"
+        }
+      };
+
+      const observable = execute(link, operation);
+
+      observable.subscribe({
+        next: jest.fn(),
+        error: error => {
+          expect(globalErrorsCheck).toHaveBeenCalledWith(mockResponse);
+          console.log("oh shit an error\n", error);
+          expect(error).toEqual(mockResponse);
+          done();
+        },
+        complete: () => {
+          done();
+        }
+      });
+    });
+  });
 });

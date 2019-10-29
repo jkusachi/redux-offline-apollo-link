@@ -12,8 +12,6 @@ import { extractFiles } from "extract-files";
 import get from "lodash/get";
 import omit from "lodash/omit";
 
-console.log("loaded");
-
 interface Options {
   uri?: string;
   fetch?: any;
@@ -30,15 +28,16 @@ interface Options {
  * @param result
  */
 function debugErrors(result, globalErrorsCheck) {
-  console.log("debugErrors");
   if (result.errors && result.errors.length > 0) {
     if (typeof globalErrorsCheck === "function") {
       globalErrorsCheck(result);
     }
+
     console.group("GraphQL Errors");
     result.errors.map(console.log);
     console.groupEnd();
   }
+  console.log("result", result);
   return result;
 }
 
@@ -66,6 +65,7 @@ const reduxOfflineApolloLink = (
   }: Options = {},
   store
 ) => {
+  console.log("globalErrorsCheck", globalErrorsCheck);
   const linkConfig = {
     http: { includeExtensions },
     options: fetchOptions,
@@ -85,8 +85,6 @@ const reduxOfflineApolloLink = (
     };
 
     const isOnline = state.offline.online;
-
-    console.log("new ApolloLink");
 
     const { options, body } = selectHttpOptionsAndBody(operation, fallbackHttpConfig, linkConfig, contextConfig);
 
@@ -173,7 +171,6 @@ const reduxOfflineApolloLink = (
     store.dispatch(omit(action, ["meta"]));
 
     return new Observable(observer => {
-      console.log("new Observable");
       // Allow aborting fetch, if supported.
       const { controller, signal } = createSignalIfSupported();
       if (controller) {
@@ -190,6 +187,7 @@ const reduxOfflineApolloLink = (
           return response;
         })
         .then(response => {
+          console.log("in response");
           if (
             linkFetchOptions.parseAndHandleHttpResponse &&
             typeof linkFetchOptions.parseAndHandleHttpResponse === "function"
@@ -197,6 +195,7 @@ const reduxOfflineApolloLink = (
             return response
               .text()
               .then(bodyText => {
+                console.log("calling", JSON.parse(bodyText));
                 try {
                   return JSON.parse(bodyText);
                 } catch (err) {
@@ -216,7 +215,7 @@ const reduxOfflineApolloLink = (
           return parseAndCheckHttpResponse(operation)(response);
         })
         .then(data => {
-          console.log("...received data");
+          console.log("...received data", data);
 
           return data;
         })
