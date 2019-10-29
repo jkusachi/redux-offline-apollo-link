@@ -37,7 +37,7 @@ const makeCallback = (done, body) => {
   };
 };
 
-describe("HttpLink", () => {
+describe("#reduxOfflineApolloLink", () => {
   const fetchMock = jest.fn();
 
   beforeEach(() => {
