@@ -160,7 +160,7 @@ describe("#reduxOfflineApolloLink", () => {
       });
     });
 
-    it("globalErrorsCheck - Called if response has any errors in it, and main result throws", done => {
+    it("globalErrorsCheck - Called if response has any errors in it, and main result throws using default errorsCheck", done => {
       const mockResponse = {
         data: "success",
         errors: ["error one"]
