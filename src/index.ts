@@ -12,6 +12,8 @@ import { extractFiles } from "extract-files";
 import get from "lodash/get";
 import omit from "lodash/omit";
 
+console.log("loaded");
+
 interface Options {
   uri?: string;
   fetch?: any;
@@ -28,6 +30,7 @@ interface Options {
  * @param result
  */
 function debugErrors(result, globalErrorsCheck) {
+  console.log("debugErrors");
   if (result.errors && result.errors.length > 0) {
     if (typeof globalErrorsCheck === "function") {
       globalErrorsCheck(result);
@@ -70,6 +73,7 @@ const reduxOfflineApolloLink = (
     headers
   };
 
+  console.log("in config");
   return new ApolloLink((operation, forward) => {
     const state = store.getState();
     const uri = selectURI(operation, fetchUri);
@@ -82,6 +86,8 @@ const reduxOfflineApolloLink = (
     };
 
     const isOnline = state.offline.online;
+
+    console.log("new ApolloLink");
 
     const { options, body } = selectHttpOptionsAndBody(
       operation,
@@ -181,14 +187,18 @@ const reduxOfflineApolloLink = (
     store.dispatch(omit(action, ["meta"]));
 
     return new Observable(observer => {
+      console.log("new Observable");
       // Allow aborting fetch, if supported.
       const { controller, signal } = createSignalIfSupported();
       if (controller) {
         options.signal = signal;
       }
 
+      console.log("uri", uri);
       linkFetch(uri, options)
         .then(response => {
+          console.log("response", response);
+          console.log("- calls", linkFetch.mock.calls);
           // Forward the response on the context.
           operation.setContext({ response });
           return response;
@@ -219,10 +229,17 @@ const reduxOfflineApolloLink = (
                 );
               });
           }
+          console.log(" - parseAndCheckHttpResponse", response);
           return parseAndCheckHttpResponse(operation)(response);
+        })
+        .then(data => {
+          console.log("...received data");
+
+          return data;
         })
         .then(errors => debugErrors(errors, globalErrorsCheck))
         .then(result => {
+          console.log("got a result, ", result);
           if (
             linkFetchOptions.errorsCheck &&
             typeof linkFetchOptions.errorsCheck === "function"
@@ -265,6 +282,7 @@ const reduxOfflineApolloLink = (
           observer.complete();
         })
         .catch(error => {
+          console.log("caught something", error);
           store.dispatch({
             type: rollbackAction.type,
             payload: {
