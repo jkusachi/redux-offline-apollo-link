@@ -20,6 +20,7 @@
     "lint": "tslint -c tslint.json -p tsconfig.json",
     "build": "tsc",
     "test": "jest",
+    "coverage": "jest --coverage",
     "jsdoc": "jsdoc-md",
     "prepublish": "npm run build"
   },
