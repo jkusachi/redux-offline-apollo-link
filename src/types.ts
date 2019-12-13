@@ -1,7 +1,3 @@
-export interface GraphQLErrors {
-  result: [any];
-}
-
 export interface GQLResponse {
   data: any | null;
   errors?: [any];
