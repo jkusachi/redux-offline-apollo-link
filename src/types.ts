@@ -14,5 +14,5 @@ export interface LinkFetchOptions {
   errorsCheck?: ErrorsCheck;
   payloadFormatter?: ErrorsCheck;
   debug?: boolean;
-  parseAndHandleHttpResponse?: any;
+  parseAndHandleHttpResponse?: (operation: any, result: any) => any;
 }
