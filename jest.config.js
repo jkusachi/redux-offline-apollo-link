@@ -19,4 +19,10 @@ module.exports = {
   },
   testPathIgnorePatterns: ["\\.snap$", "<rootDir>/node_modules/", "dist"],
   setupFiles: ["<rootDir>/setupJest.js"]
+
+  // globals: {
+  //   "ts-jest": {
+  //     diagnostics: false
+  //   }
+  // }
 };
