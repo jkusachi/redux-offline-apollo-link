@@ -2,8 +2,16 @@ export interface GraphQLErrors {
   result: [any];
 }
 
-export type GlobalErrorsCheck = (errors: GraphQLErrors) => void;
+export interface GQLResponse {
+  data: any | null;
+  errors?: [any];
+}
 
-export interface CustomOperationVariables {
-  name: "james";
+export type ErrorsCheck = (response: GQLResponse) => void;
+
+export interface LinkFetchOptions {
+  skipOffline?: boolean;
+  errorsCheck?: ErrorsCheck;
+  payloadFormatter?: ErrorsCheck;
+  debug?: boolean;
 }

@@ -7,6 +7,7 @@ import {
   selectURI,
   serializeFetchParameter
 } from "apollo-link-http-common";
+import { GQLResponse, ErrorsCheck, LinkFetchOptions } from "./types";
 
 import { extractFiles } from "extract-files";
 import get from "lodash/get";
@@ -19,7 +20,7 @@ interface Options {
   credentials?: any;
   headers?: any;
   includeExtensions?: any;
-  globalErrorsCheck?: any;
+  globalErrorsCheck?: ErrorsCheck;
   onCatchErrors?: any;
 }
 
@@ -27,7 +28,7 @@ interface Options {
  * check and display errors
  * @param result
  */
-function debugErrors(result, globalErrorsCheck) {
+function debugErrors(result: GQLResponse, globalErrorsCheck: ErrorsCheck) {
   if (result.errors && result.errors.length > 0) {
     if (typeof globalErrorsCheck === "function") {
       globalErrorsCheck(result);
@@ -45,7 +46,7 @@ function debugErrors(result, globalErrorsCheck) {
  * checks for errors and throws if they are available.
  * @param result
  */
-function errorsCheck(result) {
+function errorsCheck(result: GQLResponse) {
   if (result.errors && result.errors.length > 0) {
     throw result;
   }
@@ -65,7 +66,6 @@ const reduxOfflineApolloLink = (
   }: Options = {},
   store
 ) => {
-  console.log("globalErrorsCheck", globalErrorsCheck);
   const linkConfig = {
     http: { includeExtensions },
     options: fetchOptions,
@@ -84,17 +84,34 @@ const reduxOfflineApolloLink = (
       headers: context.headers
     };
 
-    const isOnline = state.offline.online;
+    const isOnline: boolean = state.offline.online;
 
-    const { options, body } = selectHttpOptionsAndBody(operation, fallbackHttpConfig, linkConfig, contextConfig);
+    const { options, body } = selectHttpOptionsAndBody(
+      operation,
+      fallbackHttpConfig,
+      linkConfig,
+      contextConfig
+    );
 
     const { clone, files } = extractFiles(body);
     const payload = serializeFetchParameter(clone, "Payload");
 
-    const linkFetchOptions = get(operation, "variables.options", {});
+    const linkFetchOptions: LinkFetchOptions = get(
+      operation,
+      "variables.options",
+      {}
+    );
     const reduxActionName = get(operation, "variables.actionType");
-    const reduxCommitSuffix = get(operation, "variables.actionCommitSuffix", "COMMIT");
-    const reduxRollbackSuffix = get(operation, "variables.actionRollbackSuffix", "ROLLBACK");
+    const reduxCommitSuffix = get(
+      operation,
+      "variables.actionCommitSuffix",
+      "COMMIT"
+    );
+    const reduxRollbackSuffix = get(
+      operation,
+      "variables.actionRollbackSuffix",
+      "ROLLBACK"
+    );
 
     let contentType;
     if (files.size) {
@@ -177,7 +194,6 @@ const reduxOfflineApolloLink = (
         options.signal = signal;
       }
 
-      console.log("uri", uri);
       linkFetch(uri, options)
         .then(response => {
           console.log("response", response);
@@ -186,63 +202,41 @@ const reduxOfflineApolloLink = (
           return response;
         })
         .then(response => {
-          console.log("in response");
-          if (
-            linkFetchOptions.parseAndHandleHttpResponse &&
-            typeof linkFetchOptions.parseAndHandleHttpResponse === "function"
-          ) {
-            return response
-              .text()
-              .then(bodyText => {
-                console.log("calling", JSON.parse(bodyText));
-                try {
-                  return JSON.parse(bodyText);
-                } catch (err) {
-                  const parseError = err;
-                  parseError.name = "ServerParseError";
-                  parseError.response = response;
-                  parseError.statusCode = response.status;
-                  parseError.bodyText = bodyText;
-                  return Promise.reject(parseError);
-                }
-              })
-              .then(result => {
-                return linkFetchOptions.parseAndHandleHttpResponse(operation, result);
-              });
-          }
-          console.log(" - parseAndCheckHttpResponse", response);
           return parseAndCheckHttpResponse(operation)(response);
         })
-        .then(data => {
-          console.log("...received data", data);
-
-          return data;
-        })
         .then(errors => debugErrors(errors, globalErrorsCheck))
-        .then(result => {
-          console.log("got a result, ", result);
-          if (linkFetchOptions.errorsCheck && typeof linkFetchOptions.errorsCheck === "function") {
+        .then((result: GQLResponse) => {
+          if (
+            linkFetchOptions.errorsCheck &&
+            typeof linkFetchOptions.errorsCheck === "function"
+          ) {
             return linkFetchOptions.errorsCheck(result);
           }
           return errorsCheck(result);
         })
         .then(result => {
-          if (linkFetchOptions.payloadFormatter && typeof linkFetchOptions.payloadFormatter === "function") {
+          if (
+            linkFetchOptions.payloadFormatter &&
+            typeof linkFetchOptions.payloadFormatter === "function"
+          ) {
             if (linkFetchOptions.debug) {
-              console.group("Payload Formatter");
-              console.log("Raw: ", result);
-              console.log("Formatted: ", linkFetchOptions.payloadFormatter(result));
+              console.group("ReduxOfflineApolloLink: Payload Formatter");
+              console.log("- result: ", result);
+              console.log(
+                "- formatted: ",
+                linkFetchOptions.payloadFormatter(result)
+              );
               console.groupEnd();
             }
             return { data: linkFetchOptions.payloadFormatter(result) };
           }
           return result;
         })
-        .then(result => {
+        .then((result: GQLResponse) => {
           if (linkFetchOptions.debug) {
-            console.group("Redux Result: ");
-            console.log("Dispatching: ", commitAction);
-            console.log("result.data", result.data);
+            console.group("ReduxOfflineApolloLink: Redux Result: ");
+            console.log("- dispatch action: ", commitAction);
+            console.log("- result.data", result.data);
             console.groupEnd();
           }
 
@@ -254,7 +248,6 @@ const reduxOfflineApolloLink = (
           observer.complete();
         })
         .catch(error => {
-          console.log("caught something", error);
           store.dispatch({
             type: rollbackAction.type,
             payload: {
