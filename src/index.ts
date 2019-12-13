@@ -13,6 +13,8 @@ import { extractFiles } from "extract-files";
 import get from "lodash/get";
 import omit from "lodash/omit";
 
+import AbortEffectsError from "./AbortEffectsError";
+
 interface Options {
   uri?: string;
   fetch?: any;
@@ -248,6 +250,10 @@ const reduxOfflineApolloLink = (
           observer.complete();
         })
         .catch(error => {
+          if (error instanceof AbortEffectsError) {
+            return observer.complete();
+          }
+
           store.dispatch({
             type: rollbackAction.type,
             payload: {
@@ -286,4 +292,4 @@ const reduxOfflineApolloLink = (
   });
 };
 
-export { reduxOfflineApolloLink };
+export { reduxOfflineApolloLink, AbortEffectsError };
