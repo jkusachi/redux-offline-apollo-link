@@ -4,7 +4,7 @@ module.exports = {
   preset: "ts-jest",
   testEnvironment: "node",
 
-  collectCoverage: false,
+  collectCoverage: true,
   collectCoverageFrom: ["<rootDir>/src/**/*.ts"],
   coverageDirectory: "coverage",
   coveragePathIgnorePatterns: ["/node_modules/"],
