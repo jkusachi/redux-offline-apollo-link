@@ -1,16 +1,22 @@
 {
   "defaultSeverity": "error",
-  "extends": ["tslint:recommended"],
+  "extends": [
+    "tslint:recommended"
+  ],
   "jsRules": {},
   "rules": {
     "ordered-imports": false,
     "trailing-comma": false,
     "object-literal-sort-keys": false,
-    "arrow-parens": [false],
+    "arrow-parens": [
+      false
+    ],
     "interface-name": false,
     "no-console": false
   },
   "linterOptions": {
-    "exclude": ["node_modules"]
+    "exclude": [
+      "node_modules"
+    ]
   }
 }

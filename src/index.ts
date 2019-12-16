@@ -7,6 +7,7 @@ import {
   selectURI,
   serializeFetchParameter
 } from "apollo-link-http-common";
+import { GQLResponse, ErrorsCheck, LinkFetchOptions } from "./types";
 
 import { extractFiles } from "extract-files";
 import get from "lodash-es/get";
@@ -21,7 +22,7 @@ interface Options {
   credentials?: any;
   headers?: any;
   includeExtensions?: any;
-  globalErrorsCheck?: any;
+  globalErrorsCheck?: ErrorsCheck;
   onCatchErrors?: any;
 }
 
@@ -29,11 +30,12 @@ interface Options {
  * check and display errors
  * @param result
  */
-function debugErrors(result, globalErrorsCheck) {
+function debugErrors(result: GQLResponse, globalErrorsCheck: ErrorsCheck) {
   if (result.errors && result.errors.length > 0) {
     if (typeof globalErrorsCheck === "function") {
       globalErrorsCheck(result);
     }
+
     console.group("GraphQL Errors");
     result.errors.map(console.log);
     console.groupEnd();
@@ -45,7 +47,7 @@ function debugErrors(result, globalErrorsCheck) {
  * checks for errors and throws if they are available.
  * @param result
  */
-function errorsCheck(result) {
+function errorsCheck(result: GQLResponse) {
   if (result.errors && result.errors.length > 0) {
     throw result;
   }
@@ -83,7 +85,7 @@ const reduxOfflineApolloLink = (
       headers: context.headers
     };
 
-    const isOnline = state.offline.online;
+    const isOnline: boolean = state.offline.online;
 
     const { options, body } = selectHttpOptionsAndBody(
       operation,
@@ -95,7 +97,11 @@ const reduxOfflineApolloLink = (
     const { clone, files } = extractFiles(body);
     const payload = serializeFetchParameter(clone, "Payload");
 
-    const linkFetchOptions = get(operation, "variables.options", {});
+    const linkFetchOptions: LinkFetchOptions = get(
+      operation,
+      "variables.options",
+      {}
+    );
     const reduxActionName = get(operation, "variables.actionType");
     const reduxCommitSuffix = get(
       operation,
@@ -224,7 +230,7 @@ const reduxOfflineApolloLink = (
           return parseAndCheckHttpResponse(operation)(response);
         })
         .then(errors => debugErrors(errors, globalErrorsCheck))
-        .then(result => {
+        .then((result: GQLResponse) => {
           if (
             linkFetchOptions.errorsCheck &&
             typeof linkFetchOptions.errorsCheck === "function"
@@ -239,10 +245,10 @@ const reduxOfflineApolloLink = (
             typeof linkFetchOptions.payloadFormatter === "function"
           ) {
             if (linkFetchOptions.debug) {
-              console.group("Payload Formatter");
-              console.log("Raw: ", result);
+              console.group("ReduxOfflineApolloLink: Payload Formatter");
+              console.log("- result: ", result);
               console.log(
-                "Formatted: ",
+                "- formatted: ",
                 linkFetchOptions.payloadFormatter(result)
               );
               console.groupEnd();
@@ -251,11 +257,11 @@ const reduxOfflineApolloLink = (
           }
           return result;
         })
-        .then(result => {
+        .then((result: GQLResponse) => {
           if (linkFetchOptions.debug) {
-            console.group("Redux Result: ");
-            console.log("Dispatching: ", commitAction);
-            console.log("result.data", result.data);
+            console.group("ReduxOfflineApolloLink: Redux Result: ");
+            console.log("- dispatch action: ", commitAction);
+            console.log("- result.data", result.data);
             console.groupEnd();
           }
 
