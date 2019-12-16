@@ -9,8 +9,8 @@ import {
 } from "apollo-link-http-common";
 
 import { extractFiles } from "extract-files";
-import get from "lodash-es/get";
-import omit from "lodash-es/omit";
+import get from "lodash/get";
+import omit from "lodash/omit";
 
 import AbortEffectsError from "./AbortEffectsError";
 
