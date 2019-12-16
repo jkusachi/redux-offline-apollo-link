@@ -10,8 +10,8 @@ import {
 import { GQLResponse, ErrorsCheck, LinkFetchOptions } from "./types";
 
 import { extractFiles } from "extract-files";
-import get from "lodash/get";
-import omit from "lodash/omit";
+import get from "lodash-es/get";
+import omit from "lodash-es/omit";
 
 import AbortEffectsError from "./AbortEffectsError";
 
